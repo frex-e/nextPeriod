@@ -1,7 +1,18 @@
-from datetime import datetime
+from datetime import datetime, timedelta,date
 from datetime import time
 
-today = datetime.today()
+FORMAT = "{hours}:{minutes}"
+# Use {days}, {hours}, {minutes}, {seconds}
+
+SLEEPMSG = "zzz"
+
+def strfdelta(tdelta, fmt):
+    d = {"days": tdelta.days}
+    d["hours"], rem = divmod(tdelta.seconds, 3600)
+    d["minutes"], d["seconds"] = divmod(rem, 60)
+    return fmt.format(**d)
+
+today = datetime.today() - timedelta(days=5,hours=6)
 periods = [
 [
     time(hour=8,minute=40),
@@ -27,11 +38,18 @@ periods = [
 
 def main():
     if today.weekday() == 5 or today.weekday() == 6:
-        return "zzz"
+        return SLEEPMSG
     
-    if today.time() > periods[0][-1]:
-        return "zzz"
+    if today.time() > periods[today.weekday()][-1]:
+        return SLEEPMSG
 
+    for times in periods[today.weekday()]:
+        if times < today.time():
+            nextPeriod = times
+        else: break
+
+    delta = (today - datetime.combine(today.date(),nextPeriod))
+    return strfdelta(delta,FORMAT)
     
 
 print(main())
