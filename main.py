@@ -10,6 +10,8 @@ def strfdelta(tdelta, fmt):
     d = {"days": tdelta.days}
     d["hours"], rem = divmod(tdelta.seconds, 3600)
     d["minutes"], d["seconds"] = divmod(rem, 60)
+    if int(d["minutes"]) <= 9:
+        d["minutes"] = "0" + str(d["minutes"])
     return fmt.format(**d)
 
 today = datetime.today()
@@ -65,11 +67,11 @@ def main():
         return SLEEPMSG
 
     for times in periods[today.weekday()]:
-        if times < today.time():
+        if times > today.time():
             nextPeriod = times
-        else: break
+            break
 
-    delta = (today - datetime.combine(today.date(),nextPeriod))
+    delta = (datetime.combine(today.date(),nextPeriod)-today)
     return strfdelta(delta,FORMAT)
     
 
